@@ -141,3 +141,17 @@ def test_dribble_space_score_isolated_carrier():
     score = calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds)
     # A large open cell should yield a high space/dribble viability score
     assert score > 0.7
+
+def test_dribble_space_score_heavy_pressure():
+    # Carrier is surrounded closely on all sides (tiny Voronoi cell)
+    carrier_pos = np.array([50.0, 34.0])
+    opponent_positions = np.array([
+        [51.0, 34.0],
+        [49.0, 34.0],
+        [50.0, 35.0],
+        [50.0, 33.0]
+    ])
+    pitch_bounds = (105.0, 68.0)
+
+    score = calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds)
+    assert score < 0.2
