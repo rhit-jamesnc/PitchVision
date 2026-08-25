@@ -82,4 +82,42 @@ def calculate_expected_goals(
     return float(final_xg)
 
 def calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds=(105.0, 68.0)):
-    return 0.8
+    """
+    Calculates a normalized score (0.0 to 1.0) representing whether a ball carrier 
+    should hold/dribble based on their controlled Voronoi cell area relative to max expected area.
+    """
+    carrier_pos = np.asarray(carrier_pos, dtype=float)
+    opponent_positions = np.asarray(opponent_positions, dtype=float)
+    
+    # Combine carrier and opponents to compute Voronoi diagram of all players
+    all_points = np.vstack([carrier_pos, opponent_positions])
+    
+    # Add bounding box mirror points to clip infinite Voronoi regions cleanly
+    length, width = pitch_bounds
+    vor = Voronoi(all_points)
+    
+    # Find the region corresponding to the carrier (index 0)
+    region_idx = vor.point_region[0]
+    region_vertices = vor.regions[region_idx]
+    
+    if -1 in region_vertices or len(region_vertices) == 0:
+        # Fallback if region is unbounded/malformed
+        cell_area = 0.0
+    else:
+        polygon = vor.vertices[region_vertices]
+        # Clip polygon to pitch dimensions [0, length] x [0, width]
+        clipped_x = np.clip(polygon[:, 0], 0, length)
+        clipped_y = np.clip(polygon[:, 1], 0, width)
+        clipped_polygon = np.column_stack([clipped_x, clipped_y])
+        cell_area = _polygon_area(clipped_polygon)
+        
+    # Normalize score: Assume a great open dribbling space cell is ~150-200 sq meters max
+    max_expected_area = 150.0
+    score = min(1.0, max(0.0, cell_area / max_expected_area))
+    return float(score)
+
+def _polygon_area(polygon):
+    """Calculates the area of a 2D polygon using the Shoelace formula."""
+    x = polygon[:, 0]
+    y = polygon[:, 1]
+    return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
