@@ -54,6 +54,18 @@ def test_expected_pass_completion_extreme_boundaries():
     assert 0.0 <= xpc_hard <= 1.0
     assert xpc_easy > xpc_hard
 
+def test_expected_goals_tap_in():
+    # Extremely high value: 3 meters out, central angle, 0 defenders, strong foot, tap-in/rebound
+    xg = calculate_expected_goals(
+        distance_to_goal=3.0, 
+        angle_to_goal_degrees=60.0, 
+        defenders_in_lane=0, 
+        gk_distance=2.0, 
+        body_part="strong_foot", 
+        play_type="rebound"
+    )
+    assert xg > 0.75
+
 def test_expected_goals_high_value_shot():
     # Ideal shot: close range, central angle, 0 blocking defenders, normal pass assist, strong foot
     xg = calculate_expected_goals(
