@@ -19,3 +19,8 @@ def test_decision_quality_score_good_choice():
     # If a player chooses an optimal or near-optimal low-difficulty option, score should be high
     dqs = calculate_decision_quality_score(chosen_option_difficulty=0.25, best_available_difficulty=0.2)
     assert dqs > 0.9
+
+def test_decision_quality_score_best_choice():
+    # If a player chooses the absolute best option available, score should be a perfect 1.0
+    dqs = calculate_decision_quality_score(chosen_option_difficulty=0.2, best_available_difficulty=0.2)
+    assert dqs == 1.0
