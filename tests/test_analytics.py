@@ -39,3 +39,12 @@ def test_expected_pass_completion_low_probability():
     # A long-distance pass under heavy defensive pressure should have a low xPC
     xpc = calculate_expected_pass_completion(pass_distance=35.0, nearest_defender_distance=0.5)
     assert xpc < 0.3
+
+def test_expected_pass_completion_extreme_boundaries():
+    # Extreme edge cases: zero distance with maximum defender distance, and max distance with zero defender distance
+    xpc_easy = calculate_expected_pass_completion(pass_distance=0.0, nearest_defender_distance=20.0)
+    xpc_hard = calculate_expected_pass_completion(pass_distance=50.0, nearest_defender_distance=0.0)
+    
+    assert 0.0 <= xpc_easy <= 1.0
+    assert 0.0 <= xpc_hard <= 1.0
+    assert xpc_easy > xpc_hard
