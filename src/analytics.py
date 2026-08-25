@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial import Voronoi
 
 def calculate_pass_difficulty(pass_distance, nearest_defender_distance):
     pressure_factor = max(0.0, 1.0 - (nearest_defender_distance / 5.0))
@@ -79,3 +80,6 @@ def calculate_expected_goals(
     
     final_xg = max(0.0001, min(0.95, raw_xg * bp_multiplier * pt_multiplier))
     return float(final_xg)
+
+def calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds=(105.0, 68.0)):
+    return 0.8
