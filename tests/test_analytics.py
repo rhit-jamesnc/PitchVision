@@ -34,3 +34,8 @@ def test_expected_pass_completion_medium_probability():
     # A moderate-distance pass with moderate pressure should yield a mid-range xPC
     xpc = calculate_expected_pass_completion(pass_distance=20.0, nearest_defender_distance=2.0)
     assert 0.3 <= xpc <= 0.7
+
+def test_expected_pass_completion_low_probability():
+    # A long-distance pass under heavy defensive pressure should have a low xPC
+    xpc = calculate_expected_pass_completion(pass_distance=35.0, nearest_defender_distance=0.5)
+    assert xpc < 0.3
