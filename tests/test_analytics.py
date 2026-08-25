@@ -1,4 +1,9 @@
-from src.analytics import calculate_pass_difficulty, calculate_decision_quality_score, calculate_expected_pass_completion
+from src.analytics import (
+    calculate_pass_difficulty, 
+    calculate_decision_quality_score, 
+    calculate_expected_pass_completion,
+    calculate_expected_goals
+)
 
 def test_pass_difficulty_basic():
     # A short 5-meter pass with zero pressure should be very easy (low difficulty)
@@ -48,3 +53,15 @@ def test_expected_pass_completion_extreme_boundaries():
     assert 0.0 <= xpc_easy <= 1.0
     assert 0.0 <= xpc_hard <= 1.0
     assert xpc_easy > xpc_hard
+
+def test_expected_goals_high_value_shot():
+    # Ideal shot: close range, central angle, 0 blocking defenders, normal pass assist, strong foot
+    xg = calculate_expected_goals(
+        distance_to_goal=8.0, 
+        angle_to_goal_degrees=45.0, 
+        defenders_in_lane=0, 
+        gk_distance=8.0, 
+        body_part="strong_foot", 
+        play_type="normal_pass"
+    )
+    assert xg > 0.45
