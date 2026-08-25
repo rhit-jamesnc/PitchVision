@@ -14,3 +14,8 @@ def test_decision_quality_score_poor_choice():
     # If a player chooses a high difficulty option (0.8) when a low difficulty option (0.2) exists, score should be low
     dqs = calculate_decision_quality_score(chosen_option_difficulty=0.8, best_available_difficulty=0.2)
     assert dqs < 0.5
+
+def test_decision_quality_score_good_choice():
+    # If a player chooses an optimal or near-optimal low-difficulty option, score should be high
+    dqs = calculate_decision_quality_score(chosen_option_difficulty=0.25, best_available_difficulty=0.2)
+    assert dqs > 0.9
