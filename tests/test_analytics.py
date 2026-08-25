@@ -77,3 +77,15 @@ def test_expected_goals_high_value_shot():
         play_type="normal_pass"
     )
     assert xg > 0.45
+
+def test_expected_goals_medium_value():
+    # Moderate value: 16 meters out (around top of the box), decent angle, 1 defender in lane
+    xg = calculate_expected_goals(
+        distance_to_goal=16.0, 
+        angle_to_goal_degrees=30.0, 
+        defenders_in_lane=1, 
+        gk_distance=12.0, 
+        body_part="strong_foot", 
+        play_type="normal_pass"
+    )
+    assert 0.1 <= xg <= 0.35
