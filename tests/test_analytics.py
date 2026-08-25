@@ -101,3 +101,15 @@ def test_expected_goals_low_value():
         play_type="dribble"
     )
     assert xg < 0.08
+
+def test_expected_goals_edge_cases():
+    # Edge cases: Halfway line shot (50m) and behind the goal line / negative distance bounds check
+    xg_halfway = calculate_expected_goals(
+        distance_to_goal=50.0, 
+        angle_to_goal_degrees=5.0, 
+        defenders_in_lane=0, 
+        gk_distance=40.0, 
+        body_part="strong_foot", 
+        play_type="normal_pass"
+    )
+    assert 0.01 <= xg_halfway <= 0.05
