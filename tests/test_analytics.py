@@ -89,3 +89,15 @@ def test_expected_goals_medium_value():
         play_type="normal_pass"
     )
     assert 0.1 <= xg <= 0.35
+
+def test_expected_goals_low_value():
+    # Low value: Long distance (28 meters), tight angle, 2 defenders blocking
+    xg = calculate_expected_goals(
+        distance_to_goal=28.0, 
+        angle_to_goal_degrees=10.0, 
+        defenders_in_lane=2, 
+        gk_distance=20.0, 
+        body_part="weak_foot", 
+        play_type="dribble"
+    )
+    assert xg < 0.08
