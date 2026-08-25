@@ -1,4 +1,4 @@
-from src.analytics import calculate_pass_difficulty, calculate_decision_quality_score
+from src.analytics import calculate_pass_difficulty, calculate_decision_quality_score, calculate_expected_pass_completion
 
 def test_pass_difficulty_basic():
     # A short 5-meter pass with zero pressure should be very easy (low difficulty)
@@ -24,3 +24,8 @@ def test_decision_quality_score_best_choice():
     # If a player chooses the absolute best option available, score should be a perfect 1.0
     dqs = calculate_decision_quality_score(chosen_option_difficulty=0.2, best_available_difficulty=0.2)
     assert dqs == 1.0
+
+def test_expected_pass_completion_high_probability():
+    # A short pass with no defenders nearby should have a very high xPC
+    xpc = calculate_expected_pass_completion(pass_distance=5.0, nearest_defender_distance=10.0)
+    assert xpc > 0.9
