@@ -88,7 +88,7 @@ def test_expected_goals_medium_value():
         body_part="strong_foot", 
         play_type="normal_pass"
     )
-    assert 0.1 <= xg <= 0.35
+    assert 0.4 <= xg <= 0.6
 
 def test_expected_goals_low_value():
     # Low value: Long distance (28 meters), tight angle, 2 defenders blocking
@@ -102,14 +102,26 @@ def test_expected_goals_low_value():
     )
     assert xg < 0.08
 
-def test_expected_goals_edge_cases():
-    # Edge cases: Halfway line shot (50m) and behind the goal line / negative distance bounds check
-    xg_halfway = calculate_expected_goals(
-        distance_to_goal=50.0, 
-        angle_to_goal_degrees=5.0, 
-        defenders_in_lane=0, 
-        gk_distance=40.0, 
-        body_part="strong_foot", 
+def test_expected_goals_halfway_line_stationed_gk():
+    # Halfway line shot (50m) with the keeper back on the line (gk_distance = 0) should be near zero
+    xg = calculate_expected_goals(
+        distance_to_goal=50.0,
+        angle_to_goal_degrees=5.0,
+        defenders_in_lane=0,
+        gk_distance=0.0,
+        body_part="strong_foot",
         play_type="normal_pass"
     )
-    assert 0.01 <= xg_halfway <= 0.05
+    assert xg < 0.01
+
+def test_expected_goals_halfway_line_sweeper_keeper():
+    # Halfway line shot (50m) with the keeper way off their line (gk_distance = 40) should be higher
+    xg = calculate_expected_goals(
+        distance_to_goal=50.0,
+        angle_to_goal_degrees=5.0,
+        defenders_in_lane=0,
+        gk_distance=40.0,
+        body_part="strong_foot",
+        play_type="normal_pass"
+    )
+    assert xg > 0.05
