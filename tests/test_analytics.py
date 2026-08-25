@@ -1,8 +1,10 @@
+import numpy as np
 from src.analytics import (
     calculate_pass_difficulty, 
     calculate_decision_quality_score, 
     calculate_expected_pass_completion,
-    calculate_expected_goals
+    calculate_expected_goals,
+    calculate_dribble_space_score
 )
 
 def test_pass_difficulty_basic():
@@ -125,3 +127,17 @@ def test_expected_goals_halfway_line_sweeper_keeper():
         play_type="normal_pass"
     )
     assert xg > 0.05
+
+def test_dribble_space_score_isolated_carrier():
+    # Carrier is isolated with plenty of space around them (large Voronoi cell)
+    carrier_pos = np.array([50.0, 34.0])
+    opponent_positions = np.array([
+        [70.0, 34.0],
+        [40.0, 20.0],
+        [40.0, 48.0]
+    ])
+    pitch_bounds = (105.0, 68.0) # Length, Width in meters
+
+    score = calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds)
+    # A large open cell should yield a high space/dribble viability score
+    assert score > 0.7
