@@ -88,20 +88,32 @@ def calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds=
     """
     carrier_pos = np.asarray(carrier_pos, dtype=float)
     opponent_positions = np.asarray(opponent_positions, dtype=float)
-    
-    # Combine carrier and opponents to compute Voronoi diagram of all players
-    all_points = np.vstack([carrier_pos, opponent_positions])
-    
+
     # Add bounding box mirror points to clip infinite Voronoi regions cleanly
     length, width = pitch_bounds
+    
+    # Combine carrier and opponents to compute Voronoi diagram of all players
+    all_points = np.vstack([carrier_pos, opponent_positions]) if opponent_positions.size > 0 else carrier_pos.reshape(1, 2)
+
+    bounding_box = np.array([
+        [0.0, 0.0],
+        [length, 0.0],
+        [0.0, width],
+        [length, width],
+        [0.0, width / 2.0],
+        [length, width / 2.0],
+        [length / 2.0, 0.0],
+        [length / 2.0, width]
+    ])
+    all_points = np.vstack([all_points, bounding_box])
+
     vor = Voronoi(all_points)
     
     # Find the region corresponding to the carrier (index 0)
     region_idx = vor.point_region[0]
     region_vertices = vor.regions[region_idx]
-    
-    if -1 in region_vertices or len(region_vertices) == 0:
-        # Fallback if region is unbounded/malformed
+        
+    if len(region_vertices) == 0 or -1 in region_vertices:
         cell_area = 0.0
     else:
         polygon = vor.vertices[region_vertices]
@@ -111,7 +123,7 @@ def calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds=
         clipped_polygon = np.column_stack([clipped_x, clipped_y])
         cell_area = _polygon_area(clipped_polygon)
         
-    # Normalize score: Assume a great open dribbling space cell is ~150-200 sq meters max
+    # Normalize score: Assume a great open dribbling space cell is ~150 sq meters max
     max_expected_area = 150.0
     score = min(1.0, max(0.0, cell_area / max_expected_area))
     return float(score)

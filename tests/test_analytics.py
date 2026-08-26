@@ -142,6 +142,20 @@ def test_dribble_space_score_isolated_carrier():
     # A large open cell should yield a high space/dribble viability score
     assert score > 0.7
 
+def test_dribble_space_score_partial_pressure():
+    # Carrier has a defender closing down from one side, but open space on the other
+    carrier_pos = np.array([60.0, 34.0])
+    opponent_positions = np.array([
+        [58.0, 34.0],  # Close behind
+        [65.0, 40.0],  # To the side / ahead
+        [68.0, 25.0]   # Other side
+    ])
+    pitch_bounds = (105.0, 68.0)
+
+    score = calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds)
+    # Should reflect a medium-high dribble viability score
+    assert 0.4 <= score <= 0.95
+
 def test_dribble_space_score_heavy_pressure():
     # Carrier is surrounded closely on all sides (tiny Voronoi cell)
     carrier_pos = np.array([50.0, 34.0])
@@ -155,3 +169,17 @@ def test_dribble_space_score_heavy_pressure():
 
     score = calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds)
     assert score < 0.2
+
+def test_dribble_space_score_near_touchline():
+    # Carrier is tight to the sideline (width = 0.0), restricting available cell area
+    carrier_pos = np.array([30.0, 2.0])
+    opponent_positions = np.array([
+        [32.0, 8.0],
+        [28.0, 8.0],
+        [30.0, 12.0]
+    ])
+    pitch_bounds = (105.0, 68.0)
+
+    score = calculate_dribble_space_score(carrier_pos, opponent_positions, pitch_bounds)
+    # Proximity to the boundary caps the maximum possible cell area, yielding a moderate/lower score
+    assert 0.1 <= score <= 0.6
